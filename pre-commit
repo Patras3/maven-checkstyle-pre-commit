@@ -1,4 +1,5 @@
 #!/bin/bash -e
+
 function get_module() {
   local path=$1;
   while true; do
@@ -13,13 +14,16 @@ function get_module() {
 }
 
 modules=();
+changed_files=();
 
 for file in $(git diff --name-only --cached \*.java); do
   module=$(get_module "$file");
-  if [ "" != "$module" ] \
-      && [[ ! " ${modules[@]} " =~ " $module " ]]; then
+  if [ "" != "$module" ] && [[ ! " ${modules[@]} " =~ " $module " ]]; then
     modules+=("$module");
   fi
+  # Extract just the filename and prepend with **/
+  filename=$(basename "$file")
+  changed_files+=("**/$filename");
 done;
 
 if [ ${#modules[@]} -eq 0 ]; then
@@ -29,8 +33,11 @@ fi
 modules_arg=$(printf ",%s" "${modules[@]}");
 modules_arg=${modules_arg:1};
 
-export MAVEN_OPTS="-client
-  -XX:+TieredCompilation
-  -XX:TieredStopAtLevel=1";
+# Join changed_files array into a comma-separated string
+changed_files_arg=$(printf ",%s" "${changed_files[@]}");
+changed_files_arg=${changed_files_arg:1};
 
-./mvnw -pl "$modules_arg" checkstyle:checkstyle;
+export MAVEN_OPTS="-client -XX:+TieredCompilation -XX:TieredStopAtLevel=1";
+
+# Include changed_files_arg in the Maven command
+./mvnw --batch-mode -pl "$modules_arg" checkstyle:checkstyle -Dcheckstyle.includes="$changed_files_arg";
