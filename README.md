@@ -1,5 +1,5 @@
 How to install?
-1. Save pre-commit file into <repo>/.git/hooks
+1. Save pre-commit file into `<repo>/.git/hooks` directory
 2. Add executable permissions `chmod +x pre-commit`
 3. Commit 🚀
 
