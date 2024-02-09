@@ -39,5 +39,6 @@ changed_files_arg=${changed_files_arg:1};
 
 export MAVEN_OPTS="-client -XX:+TieredCompilation -XX:TieredStopAtLevel=1";
 
+ALL_PROFILES=$(./mvnw help:all-profiles | grep "Profile Id:" | awk '{print $3}' | sort | uniq | tr '\n' ',')
 # Include changed_files_arg in the Maven command
-./mvnw --batch-mode -pl "$modules_arg" checkstyle:checkstyle -Dcheckstyle.includes="$changed_files_arg";
+./mvnw --batch-mode -P${ALL_PROFILES} -pl "$modules_arg" checkstyle:checkstyle -Dcheckstyle.includes="$changed_files_arg" -Dcheckstyle.skip=false; 
