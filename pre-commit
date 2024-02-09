@@ -31,7 +31,6 @@ modules_arg=${modules_arg:1};
 
 export MAVEN_OPTS="-client
   -XX:+TieredCompilation
-  -XX:TieredStopAtLevel=1
-  -Xverify:none";
+  -XX:TieredStopAtLevel=1";
 
-mvn -q -pl "$modules_arg" checkstyle:check;
+./mvnw -pl "$modules_arg" checkstyle:checkstyle;
